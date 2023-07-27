@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+
+  daprproblem:
+    image: ${DOCKER_REGISTRY-}daprproblem
+    build:
+      context: .
+      dockerfile: DaprProblem/Dockerfile
+    ports:
+    - "8080:80" 
+  daprproblem-dapr:
+    image: "daprio/daprd:edge"
+    command: ["./daprd",
+        "-app-id", "dapr1",
+        "-app-port", "80"
+    ]
+    depends_on:
+        - daprproblem
+    network_mode: "service:daprproblem"
+
+  daprproblem-two:
+    image: ${DOCKER_REGISTRY-}daprproblemtwo
+    build:
+      context: .
+      dockerfile: DaprProblem.Two/Dockerfile
+
+  daprproblem-two-dapr:
+    image: "daprio/daprd:edge"
+    command: ["./daprd",
+        "-app-id", "dapr2",
+        "-app-port", "80"
+    ]
+    depends_on:
+        - daprproblem-two
+    network_mode: "service:daprproblem-two"
+
+
